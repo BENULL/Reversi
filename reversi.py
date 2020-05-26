@@ -23,9 +23,7 @@ class Reversi():
         return 0 <= x < self.n and 0 <= y < self.n
     
     def nextPosition(self,direction,x,y):
-        x+=direction[0]
-        y+=direction[1]
-        return x,y
+        return x+direction[0],y+direction[1]
     
     def score(self,r,c):
         return list(itertools.chain.from_iterable([self.scoreDirection(r+m[0],c+m[1],m,self.step%2+1,[]) for m in Reversi._DIRECTIONS]))
@@ -40,6 +38,16 @@ class Reversi():
             return turn
 
     def checkPut(self, pos):
+        '''check person's put
+
+        Args:
+            pos:(int,int)
+        Returns:
+        Raises:
+            
+
+
+        '''
         # check person put
         assert len(pos)>=2 , 'move position disable'
         r = ord(pos[0]) - 97
@@ -74,6 +82,14 @@ class Reversi():
             self.status = [Status.DRAW.value,Status.OWIN.value,Status.XWIN.value][(oNum > xNum)-(oNum<xNum)]
     
     def cmp(self,a,b):
+        '''compare a and b 
+
+        Args:
+            a:[(int,int),[(int,int),]]
+            b:[(int,int),[(int,int),]]
+        Returns:
+
+        '''
         if len(a[1])>len(b[1]):
             return a 
         elif len(a[1])==len(b[1]) and a[0]<b[0]:
@@ -82,13 +98,30 @@ class Reversi():
             return b
             
     def aiPut(self):
-        # computer put
+        '''get the location of the computer's put and the location of the pieces to be filpped
+
+        If there's no place to put return (),[]
+        else return the best pos to put
+
+        Args:
+        Returns:
+           a: (int,int)
+            the position to put
+           b:[(int,int),]
+            the position of the pieces to be flipped
+        '''
         allPos = filter(lambda pos : self.b.board[pos[0]][pos[1]]==0,itertools.product(range(self.n),repeat=2))
         allScoreForPos  = map(lambda pos: [pos,self.score(pos[0],pos[1])],allPos)
         maxScorePos = reduce(self.cmp,allScoreForPos,[(),[]])
         return maxScorePos[0],maxScorePos[1]
 
     def aiPlay(self):
+        '''
+        the computer's turn to play chess
+
+        Args:
+        Returns:
+        '''
         pos,turnList = self.aiPut()
         if turnList:
             print('Computer places {} at {}'.format(self.b.chess[self.step % 2+1],chr(pos[0]+97)+chr(pos[1]+97)))
@@ -99,6 +132,12 @@ class Reversi():
             self.turn += 1
 
     def pPlay(self):
+        '''
+        the person's turn to play chess
+
+        Args:
+        Returns:
+        '''
         pos = input('Enter move for {} (RowCol):'.format(self.b.chess[self.step % 2+1]))
         if self.checkPut(pos):
             reversi.b.draw()
@@ -108,6 +147,12 @@ class Reversi():
             print('Invalid move')
 
     def play(self):
+        '''
+        control the game progress
+
+        Args:
+        Returns:
+        '''
         self.status = Status.ONGOING
         plays = [self.aiPlay,self.pPlay]
         while self.status == Status.ONGOING:
