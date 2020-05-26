@@ -20,15 +20,69 @@ class Reversi():
         self.status = Status.WAIT                               # game status
 
     def isValidPosition(self,x,y):
+        '''check the positions 
+
+        Args:
+            x:int
+                the row index
+            y:int
+                the col index
+        Returns:
+            bool:
+                the position valid or invalid
+        '''
         return 0 <= x < self.n and 0 <= y < self.n
     
     def nextPosition(self,direction,x,y):
+        '''the next positions to move
+
+        Args:
+            direction:[(int,int),]
+                the directions to move
+            r:int
+                the row index
+            c:int
+                the col index
+        Returns:
+            int,int:
+                the position's row index and col index
+        '''
         return x+direction[0],y+direction[1]
     
     def score(self,r,c):
+        '''get the positions to be flipped when put in r,c
+       
+        Args:
+            r:int
+                the row index
+            c:int
+                the col index
+        Returns:
+            List:
+                the list has the position of the pieces to be flipped if put the chess in r,c
+        '''
+
         return list(itertools.chain.from_iterable([self.scoreDirection(r+m[0],c+m[1],m,self.step%2+1,[]) for m in Reversi._DIRECTIONS]))
 
     def scoreDirection(self,x,y,direction,color,turn):
+        '''find the positions to flipped
+       
+        Args:
+            x:int
+                the row index
+            y:int
+                the col index
+            direction:[(int,int),]
+                eight directions to move
+            color:int
+                the color of chess to put
+            turn:[(int,int),]
+                the positions to flipped
+        Returns:
+            [(int,int),]:
+                the positions to flipped
+        '''
+
         if not self.isValidPosition(x,y) or self.b.board[x][y]==0 :
             return []
         if self.b.board[x][y]!=color:
@@ -42,20 +96,18 @@ class Reversi():
 
         Args:
             pos:(int,int)
+                check the position where person put 
         Returns:
         Raises:
-            
-
-
+            AssertionError: move position disable
         '''
-        # check person put
+
         assert len(pos)>=2 , 'move position disable'
         r = ord(pos[0]) - 97
         c = ord(pos[1]) - 97
         assert 0 <= r < self.n and 0 <= c < self.n, 'move position disable'
         turnList = self.score(r, c)
         if turnList:
-            # turn chess
             for x,y in turnList+[(r,c)]:
                 self.b.board[x][y] = self.step % 2+1
             return True
@@ -63,7 +115,12 @@ class Reversi():
             return False
 
     def checkGame(self):
-        # check game status
+        '''check game status
+        check the game to set status
+        Args:
+        Returns:
+        '''
+       
         empty,oNum,xNum = operator.itemgetter(0,1,2)(collections.Counter(itertools.chain.from_iterable(self.b.board)))
         hasPut = True
         pos,turnList = self.aiPut()
