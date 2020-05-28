@@ -20,68 +20,68 @@ class Reversi():
         self.status = Status.WAIT                               # game status
 
     def isValidPosition(self,x,y):
-        '''check the positions 
-
+        """检查位置的有效性
         Args:
             x:int
-                the row index
+                行坐标
             y:int
-                the col index
+                列坐标
         Returns:
-            bool:
-                the position valid or invalid
-        '''
+            bool:  
+        """
+
         return 0 <= x < self.n and 0 <= y < self.n
     
     def nextPosition(self,direction,x,y):
-        '''the next positions to move
+        """得到这个方向下一步坐标
 
         Args:
-            direction:[(int,int),]
-                the directions to move
+            direction:Tuple(int,int)
+                移动的方向
             r:int
-                the row index
+                行坐标
             c:int
-                the col index
+                列坐标
         Returns:
             int,int:
-                the position's row index and col index
-        '''
+                下一个位置的行坐标和列坐标
+        """
+
         return x+direction[0],y+direction[1]
     
     def score(self,r,c):
-        '''get the positions to be flipped when put in r,c
+        """得到落子在r,c处时需翻转的棋子坐标的集合
        
         Args:
             r:int
-                the row index
+                行坐标
             c:int
-                the col index
+                列坐标
         Returns:
-            List:
-                the list has the position of the pieces to be flipped if put the chess in r,c
-        '''
+            List(Tuple(int,int)):
+                落子在r,c处时需翻转的棋子坐标的集合
+        """
 
         return list(itertools.chain.from_iterable([self.scoreDirection(r+m[0],c+m[1],m,self.step%2+1,[]) for m in Reversi._DIRECTIONS]))
 
     def scoreDirection(self,x,y,direction,color,turn):
-        '''find the positions to flipped
+        """得到需要翻转的棋子坐标
        
         Args:
             x:int
-                the row index
+                行坐标
             y:int
-                the col index
-            direction:[(int,int),]
-                eight directions to move
+                列坐标
+            direction:List(Tuple(int,int))
+                移动的方向
             color:int
-                the color of chess to put
-            turn:[(int,int),]
-                the positions to flipped
+                落子的棋子颜色
+            turn:List(Tuple(int,int))
+                需翻转的棋子坐标的集合
         Returns:
-            [(int,int),]:
-                the positions to flipped
-        '''
+            List(Tuple(int,int)):
+                需翻转的棋子坐标的集合
+        """
 
         if not self.isValidPosition(x,y) or self.b.board[x][y]==0 :
             return []
@@ -92,15 +92,13 @@ class Reversi():
             return turn
 
     def checkPut(self, pos):
-        '''check person's put
-
+        """检查人落子是否有效
         Args:
-            pos:(int,int)
-                check the position where person put 
+            pos:Tuple(int,int)       
         Returns:
         Raises:
-            AssertionError: move position disable
-        '''
+            AssertionError: 落子位置无效
+        """
 
         assert len(pos)>=2 , 'move position disable'
         r = ord(pos[0]) - 97
@@ -115,11 +113,10 @@ class Reversi():
             return False
 
     def checkGame(self):
-        '''check game status
-        check the game to set status
+        """检查游戏状态
         Args:
         Returns:
-        '''
+        """
        
         empty,oNum,xNum = operator.itemgetter(0,1,2)(collections.Counter(itertools.chain.from_iterable(self.b.board)))
         hasPut = True
@@ -139,46 +136,49 @@ class Reversi():
             self.status = [Status.DRAW.value,Status.OWIN.value,Status.XWIN.value][(oNum > xNum)-(oNum<xNum)]
     
     def cmp(self,a,b):
-        '''compare a and b 
+        """比较
 
         Args:
-            a:[(int,int),[(int,int),]]
-            b:[(int,int),[(int,int),]]
+            a:List(Tuple(int,int),List(Tuple(int,int)))
+            b:List(Tuple(int,int),List(Tuple(int,int)))
         Returns:
+            返回List[1]长度大的，相等则返回行坐标小的，行坐标相等时返回列坐标小的
+        """
 
-        '''
         if len(a[1])>len(b[1]):
             return a 
-        elif len(a[1])==len(b[1]) and a[0]<b[0]:
+        elif len(a[1])==len(b[1]) and a[0]<=b[0]:
             return a
         else:
             return b
-            
+          
     def aiPut(self):
-        '''get the location of the computer's put and the location of the pieces to be filpped
+        """得到电脑得落子位置和待翻转的棋子坐标集合
 
-        If there's no place to put return (),[]
-        else return the best pos to put
-
+        有位置可下时返回最佳落子位置
+        没有位置可以下时返回(),[]
+        
         Args:
         Returns:
-           a: (int,int)
-            the position to put
-           b:[(int,int),]
-            the position of the pieces to be flipped
-        '''
+           Tuple(int,int)
+            落子位置
+           List(Tuple(int,int))
+            待翻转的棋子坐标集合
+        """
+
         allPos = filter(lambda pos : self.b.board[pos[0]][pos[1]]==0,itertools.product(range(self.n),repeat=2))
         allScoreForPos  = map(lambda pos: [pos,self.score(pos[0],pos[1])],allPos)
         maxScorePos = reduce(self.cmp,allScoreForPos,[(),[]])
         return maxScorePos[0],maxScorePos[1]
 
     def aiPlay(self):
-        '''
-        the computer's turn to play chess
+        """
+        电脑落子逻辑
 
         Args:
         Returns:
-        '''
+        """
+
         pos,turnList = self.aiPut()
         if turnList:
             print('Computer places {} at {}'.format(self.b.chess[self.step % 2+1],chr(pos[0]+97)+chr(pos[1]+97)))
@@ -189,12 +189,13 @@ class Reversi():
             self.turn += 1
 
     def pPlay(self):
-        '''
-        the person's turn to play chess
+        """
+        人落子逻辑
 
         Args:
         Returns:
-        '''
+        """
+
         pos = input('Enter move for {} (RowCol):'.format(self.b.chess[self.step % 2+1]))
         if self.checkPut(pos):
             reversi.b.draw()
@@ -204,12 +205,13 @@ class Reversi():
             print('Invalid move')
 
     def play(self):
-        '''
-        control the game progress
+        """
+        控制游戏进程
 
         Args:
         Returns:
-        '''
+        """
+        
         self.status = Status.ONGOING
         plays = [self.aiPlay,self.pPlay]
         while self.status == Status.ONGOING:

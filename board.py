@@ -8,12 +8,13 @@ class Board():
         self.chess = {0: '.', 1: 'O', 2: 'X'}
 
     def generateBoard(self):
-        '''
-        generate initialization chessboard 
+        """
+        生成初始棋盘
         
         Args:
         Returns:
-        '''
+        """
+
         i = int(self.n / 2)
         board = [[0] * self.n for _ in range(self.n)]
         board[i][i]=board[i-1][i-1] = 1
@@ -21,12 +22,12 @@ class Board():
         return board
 
     def draw(self):
-        '''
-        draw the board 
+        """
+        绘出棋盘 
 
         Args:
         Returns:
-        '''
+        """
 
         index = 'abcdefghijklmnopqrstuvwxyz'
         print(' ',*index[:self.n])
