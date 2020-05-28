@@ -7,6 +7,8 @@ import operator
 import collections
 from functools import reduce
 from constant import Status
+import time
+import csv
 
 class Reversi():
 
@@ -220,6 +222,34 @@ class Reversi():
         else:
             print('Game over. {}'.format(Status(self.status)))
 
+    def saveGameToCsv(self,startTime,endTime,turn):
+        """
+        记录游戏信息保存到csv文件
+
+        Args:
+            startTime:float
+                游戏开始时间
+            endTime:float
+                游戏结束时间
+            turn:str
+                电脑执黑或白
+        """
+
+        start= time.strftime('%Y%m%d %H:%M:%S',time.localtime(startTime))
+        duration = int(endTime - startTime)
+        size = f'{self.n}*{self.n}'
+        xPlayer = {'x':'Computer','o':'Human'}[turn.lower()]
+        OPlayer = {'o':'Computer','x':'Human'}[turn.lower()]
+        oNum,xNum = operator.itemgetter(1,2)(collections.Counter(itertools.chain.from_iterable(self.b.board)))
+        score = f'{xNum} to {oNum}'
+        info = [start,duration,size,xPlayer,OPlayer,score]
+        with open('./Reversi.csv', 'a') as f:
+            writer = csv.writer(f)
+            writer.writerow(info)
+        print('history has saved to Reversi.csv')
+
+
+
 if __name__ == "__main__":
     print('Enter the board dimension:')
     try:
@@ -232,8 +262,12 @@ if __name__ == "__main__":
     turn = input()
     assert turn in ['X','x','O', 'o'], 'the symbol of computer is disable'
     # generate game
+    startTime = time.time()
     reversi = Reversi(n, turn)
     # draw board
     reversi.b.draw()
     reversi.play()
+    endTime = time.time()
+    # save game info
+    reversi.saveGameToCsv(startTime,endTime,turn)
     input('Enter to quit')
