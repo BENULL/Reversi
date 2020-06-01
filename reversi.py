@@ -222,7 +222,7 @@ class Reversi():
         else:
             print('Game over. {}'.format(Status(self.status)))
 
-    def saveGameToCsv(self,startTime,endTime,turn):
+    def saveGameToCsv(self,startTime,endTime,turn,filename='Reversi.csv'):
         """
         记录游戏信息保存到csv文件
 
@@ -234,19 +234,17 @@ class Reversi():
             turn:str
                 电脑执黑或白
         """
-
+        
         start= time.strftime('%Y%m%d %H:%M:%S',time.localtime(startTime))
         duration = int(endTime - startTime)
         size = f'{self.n}*{self.n}'
-        xPlayer = {'x':'Computer','o':'Human'}[turn.lower()]
-        OPlayer = {'o':'Computer','x':'Human'}[turn.lower()]
-        oNum,xNum = operator.itemgetter(1,2)(collections.Counter(itertools.chain.from_iterable(self.b.board)))
-        score = f'{xNum} to {oNum}'
-        info = [start,duration,size,xPlayer,OPlayer,score]
-        with open('./Reversi.csv', 'a') as f:
+        xPlayer,oPlayer = ('Computer','Human') if turn.lower() == 'x' else  ('Human','Computer')
+        score = '{} to {}'.format(*operator.itemgetter(2,1)(collections.Counter(itertools.chain.from_iterable(self.b.board))))
+        info = [start,duration,size,xPlayer,oPlayer,score]
+        with open(f'./{filename}', 'a') as f:
             writer = csv.writer(f)
             writer.writerow(info)
-        print('history has saved to Reversi.csv')
+        print(f'history has been saved to {filename}')
 
 
 

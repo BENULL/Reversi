@@ -4,12 +4,6 @@
 
 from enum import Enum
 
-_STATUS = {0: 'wait the game to start',
-           1: 'in the game',
-           2: 'someone fouls in the game',
-           3: 'X player wins!',
-           4: 'O player wins!',
-           5: 'DRAW!'}
 
 class Status(Enum):
 
@@ -22,3 +16,10 @@ class Status(Enum):
 
     def __str__(self):
         return str(_STATUS[self.value])
+
+_STATUS = {Status.WAIT.value: 'wait the game to start',
+           Status.ONGOING.value: 'in the game',
+           Status.FOUL.value: 'someone fouls in the game',
+           Status.XWIN.value: 'X player wins!',
+           Status.OWIN.value: 'O player wins!',
+           Status.DRAW.value: 'DRAW!'}
